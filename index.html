@@ -2,6 +2,25 @@
 	<head>
 		<title>Denon AVR Interface</title>
 		<script src="https://unpkg.com/htmx.org@2.0.3"></script>
+<style>
+body {
+	background: #333;
+	color: #00AA00;
+}
+button {
+	background: #111;
+	color: #00CC00;
+	border: none;
+	padding: 10px 20px;
+	font-size: 16px;
+	font-weight: bold;
+	transition: background-color 0.3s, color 0.3s;
+}
+button:hover {
+	background-color: #222;
+	color: #fff;
+}
+</style>
 	</head>
 	<body>
 		<div id="modes">
@@ -15,7 +34,7 @@
 			<button hx-get="/vol/-5" hx-target='#log' hx-queue="true">Vol -</button>
 			<button hx-get="/vol/+5" hx-target='#log' hx-queue="true">Vol +</button>
 		</div>
-		<div id="log">
+		<div id="log">Hello World</div>
 
 	</body>
 </html>

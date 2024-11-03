@@ -108,7 +108,7 @@ func volSet(x int){
 	defer con.Close()
 
 	fmt.Println("Setting Volume to",x)
-	data := []byte(fmt.Sprintf("MV ",x,"\r"))
+	data := []byte(fmt.Sprintf("MV%02d\r",x))
 	fmt.Println(data)
 	sendCommand(data,con)
 }
