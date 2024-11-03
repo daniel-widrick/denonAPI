@@ -1,0 +1,21 @@
+<html>
+	<head>
+		<title>Denon AVR Interface</title>
+		<script src="https://unpkg.com/htmx.org@2.0.3"></script>
+	</head>
+	<body>
+		<div id="modes">
+			<h3>Modes</h3>
+			<button hx-get="/dolbyMovie" hx-target='#log'>Movie</button>
+			<button hx-get="/stereo" hx-target='#log'>Stereo</button>
+			<button hx-get="/direct" hx-target='#log'>Direct</button>
+		</div>
+		<div id="Controls">
+			<h3>Controls</h3>
+			<button hx-get="/vol/-5" hx-target='#log' hx-queue="true">Vol -</button>
+			<button hx-get="/vol/+5" hx-target='#log' hx-queue="true">Vol +</button>
+		</div>
+		<div id="log">
+
+	</body>
+</html>

@@ -5,6 +5,8 @@ import (
 	"log"
 	"net"
 	"net/http"
+	"strconv"
+	"strings"
 	"time"
 )
 
@@ -14,6 +16,10 @@ func main(){
 	mux.Handle("/dolbyMovie",&DolbyHandler{})
 	mux.Handle("/stereo",&StereoHandler{})
 	mux.Handle("/direct",&DirectHandler{})
+	mux.HandleFunc("/vol/{setting}",volHandler)
+	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w,r,"index.html")
+	})
 	http.ListenAndServe(":8080",mux)
 
 }
@@ -33,6 +39,38 @@ func(d *DirectHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	direct()
 }
 
+func volHandler(w http.ResponseWriter, r *http.Request){
+	param := r.PathValue("setting")
+	if strings.Contains(param, "+"){
+		param = strings.ReplaceAll(param,"+","")
+		adjustment,err := strconv.Atoi(param)
+		if err != nil {
+			msg := fmt.Sprintf("Unable to parse to int: ",param)
+			w.Write([]byte(msg))
+			return
+		}
+		volUp(adjustment)
+		return
+	} else if strings.Contains(param, "-"){
+		param = strings.ReplaceAll(param,"-","")
+		adjustment, err := strconv.Atoi(param)
+		if err != nil {
+			msg := fmt.Sprintf("Unable to parse to int: ",param)
+			w.Write([]byte(msg))
+			return
+		}
+		volDown(adjustment)
+	} else {
+		adjustment,err := strconv.Atoi(param)
+		if err != nil {
+			msg := fmt.Sprintf("Unable to parse int: ",param)
+			w.Write([]byte(msg))
+			return
+		}
+		volSet(adjustment)
+	}
+}
+
 func avrConnect() net.Conn {
 	const AVR_ADDR = "192.168.67.246:23"
 	con, err := net.Dial("tcp",AVR_ADDR)
@@ -41,6 +79,38 @@ func avrConnect() net.Conn {
 	}
 	fmt.Println("Connected to AVR")
 	return con
+}
+
+func volUp(x int){
+	con := avrConnect()
+	defer con.Close()
+
+	fmt.Println("Increasing Volume:",x)
+	data := []byte(fmt.Sprintf("MVUP\r"))
+	fmt.Println(data)
+	for i := 0; i < x*2; i++{
+		sendCommand(data, con)
+	}
+}
+func volDown(x int){
+	con := avrConnect()
+	defer con.Close()
+
+	fmt.Println("Decreasing Volume:",x)
+	data := []byte(fmt.Sprintf("MVDOWN\r"))
+	fmt.Println(data)
+	for i := 0; i < x*2; i++{
+		sendCommand(data, con)
+	}
+}
+func volSet(x int){
+	con := avrConnect()
+	defer con.Close()
+
+	fmt.Println("Setting Volume to",x)
+	data := []byte(fmt.Sprintf("MV ",x,"\r"))
+	fmt.Println(data)
+	sendCommand(data,con)
 }
 
 func direct() {
@@ -103,5 +173,5 @@ func sendCommand(data []byte, con net.Conn){
 	if err != nil {
 		log.Fatalf("[ERR] :: %s\n",err)
 	}
-	time.Sleep(2*time.Second)
+	time.Sleep(20*time.Millisecond)
 }
