@@ -1,8 +1,8 @@
-FROM golang:latest AS nbuilder
+FROM golang:latest AS builder
 
 WORKDIR /app
 
-COPY go.mod go.sum ./
+COPY go.mod ./
 RUN go mod download
 
 COPY . .
@@ -12,5 +12,5 @@ FROM scratch
 COPY --from=builder /app/denonapi /denonapi
 COPY ./index.html /index.html
 
-ENTRYPOINT ["/denonapp"]
+ENTRYPOINT ["/denonapi"]
 
