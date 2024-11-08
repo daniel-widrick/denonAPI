@@ -20,6 +20,7 @@ func main(){
 	mux.HandleFunc("/music",musicHandler)
 	mux.HandleFunc("/game",gameHandler)
 	mux.HandleFunc("/tv",tvHandler)
+	mux.HandleFunc("/network",networkHandler)
 	mux.HandleFunc("/cursor/{cursor}",cursorHandler)
 	mux.HandleFunc("/menu/{state}",menuHandler)
 	mux.HandleFunc("/input/{state}",inputHandler)
@@ -88,10 +89,10 @@ func cursorHandler(w http.ResponseWriter, r *http.Request){
 		fmt.Fprint(w,"MNENT")
 	case "right":
 		sendCommand([]byte("MNCRT\r"),con)
-		fmt.Fprint(w,"MNCLR")
+		fmt.Fprint(w,"MNCTT")
 	case "left":
-		sendCommand([]byte("MNCLR\r"),con)
-		fmt.Fprint(w,"MNCLR")
+		sendCommand([]byte("MNCLT\r"),con)
+		fmt.Fprint(w,"MNCLT")
 	case "up":
 		sendCommand([]byte("MNCUP\r"),con)
 		fmt.Fprint(w,"MNUP")
@@ -128,6 +129,11 @@ func gameHandler(w http.ResponseWriter, r *http.Request){
 	sendCommand([]byte("SIGAME\r"),con)
 	sendCommand([]byte("MSMCH STEREO\r"),con)
 	w.Write([]byte("GameMode Activated"))
+}
+func networkHandler(w http.ResponseWriter, r *http.Request){
+	con := avrConnect()
+	defer con.Close()
+	sendCommand([]byte("SINET\r"),con)
 }
 func tvHandler(w http.ResponseWriter, r *http.Request){
 	con := avrConnect()
