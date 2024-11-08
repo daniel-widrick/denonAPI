@@ -2,15 +2,6 @@
 	<head>
 		<title>Denon AVR Interface</title>
 		<script src="https://unpkg.com/htmx.org@2.0.3"></script>
-		<script>
-			function toggleMenu(button){
-				const currentURL = button.getAttribute("hx-get")
-				const newURL = currentURL === "/menu/on" ? "/menu/off" : "/menu/on"
-				alert(newURL)
-				button.setAttribute("hx-get",newURL)
-				alert(button.getAttribute("hx-get"))
-			}
-		</script>
 <style>
 body {
 	background: #333;
