@@ -2,6 +2,15 @@
 	<head>
 		<title>Denon AVR Interface</title>
 		<script src="https://unpkg.com/htmx.org@2.0.3"></script>
+		<script>
+			function toggleMenu(button){
+				const currentURL = button.getAttribute("hx-get")
+				const newURL = currentURL === "/menu/on" ? "/menu/off" : "/menu/on"
+				alert(newURL)
+				button.setAttribute("hx-get",newURL)
+				alert(button.getAttribute("hx-get"))
+			}
+		</script>
 <style>
 body {
 	background: #333;
@@ -19,6 +28,19 @@ button {
 button:hover {
 	background-color: #222;
 	color: #fff;
+}
+#arrows {
+	text-align: center;
+	max-width: 350px;
+	border: 1px solid #122112;
+	margin: 5px;
+}
+#arrowTop, #arrowMiddle, #arrowBottom {
+	margin: 5px;
+}
+.darkGreen {
+	background-color: #007700;
+	color: #ffffff;
 }
 </style>
 	</head>
@@ -38,10 +60,33 @@ button:hover {
 		</div>
 		<div id="Controls">
 			<h3>Controls</h3>
-			<button hx-get="/vol/-5" hx-target='#log' hx-queue="true">Vol -</button>
-			<button hx-get="/vol/+5" hx-target='#log' hx-queue="true">Vol +</button>
+			<div id="arrows">
+				<div id="arrowVol">
+					<button hx-get="/vol/-5" hx-target='#log' hx-queue="true">Vol -</button>
+					<button hx-get="/vol/+5" hx-target='#log' hx-queue="true">Vol +</button>
+				</div>
+
+				<div id="arrowTop">
+					<button hx-get="/cursor/up" hx-target='#log'>Up</button>
+				</div>
+				<div id="arrowMiddle">
+					<button hx-get="/cursor/left" hx-target='#log'>Left</button>
+					<button hx-get="/cursor/enter" hx-target='#log'>Enter</button>
+					<button hx-get="/cursor/right" hx-target='#log'>Right</button>
+				</div>
+				<div id="arrowBottom">
+					<button hx-get="/cursor/down" hx-target='#log'>Down</button>
+				</div>
+				<div id="arrowRet">
+					<button hx-get="/menu/on" hx-swap="outerHTML">Menu</button>
+					<button hx-get="/cursor/return" hx-target='#log'>Back</button>
+					<button hx-get="/input/on" hx-swap="outerHTML">Input</button>
+				</div>
+
+			</div>
 		</div>
 		<div id="log">Hello World</div>
+
 
 	</body>
 </html>

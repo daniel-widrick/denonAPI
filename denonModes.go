@@ -20,6 +20,9 @@ func main(){
 	mux.HandleFunc("/music",musicHandler)
 	mux.HandleFunc("/game",gameHandler)
 	mux.HandleFunc("/tv",tvHandler)
+	mux.HandleFunc("/cursor/{cursor}",cursorHandler)
+	mux.HandleFunc("/menu/{state}",menuHandler)
+	mux.HandleFunc("/input/{state}",inputHandler)
 	mux.HandleFunc("/vol/{setting}",volHandler)
 	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		http.ServeFile(w,r,"index.html")
@@ -41,6 +44,66 @@ func(d *StereoHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 type DirectHandler struct{}
 func(d *DirectHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	direct()
+}
+
+func inputHandler(w http.ResponseWriter, r *http.Request){
+	con := avrConnect()
+	defer con.Close()
+	state := r.PathValue("state")
+	switch strings.ToLower(state){
+	case "on":
+		sendCommand([]byte("MNSRC ON\r"),con)
+		fmt.Fprintf(w,"<button class='darkGreen' hx-get='input/off' hx-swap='outerHTML'>Input</button>")
+	case "off":
+		sendCommand([]byte("MNSRC OFF\r"),con)
+		fmt.Fprintf(w,"<button hx-get='input/on' hx-swap='outerHTML'>Input</button>")
+
+	default:
+		fmt.Fprintf(con,"Unknown menu Command: %s",state)
+	}
+}
+func menuHandler(w http.ResponseWriter, r *http.Request){
+	con := avrConnect()
+	defer con.Close()
+	state := r.PathValue("state")
+	switch strings.ToLower(state){
+	case "on":
+		sendCommand([]byte("MNMEN ON\r"),con)
+		fmt.Fprintf(w,"<button class='darkGreen' hx-get='menu/off' hx-swap='outerHTML'>Menu</button>")
+	case "off":
+		sendCommand([]byte("MNMEN OFF\r"),con)
+		fmt.Fprintf(w,"<button hx-get='menu/on' hx-swap='outerHTML'>Menu</button>")
+
+	default:
+		fmt.Fprintf(con,"Unknown menu Command: %s",state)
+	}
+}
+func cursorHandler(w http.ResponseWriter, r *http.Request){
+	con := avrConnect()
+	defer con.Close()
+	cursor := r.PathValue("cursor")
+	switch strings.ToLower(cursor){
+	case "enter":
+		sendCommand([]byte("MNENT\r"),con)
+		fmt.Fprint(w,"MNENT")
+	case "right":
+		sendCommand([]byte("MNCRT\r"),con)
+		fmt.Fprint(w,"MNCLR")
+	case "left":
+		sendCommand([]byte("MNCLR\r"),con)
+		fmt.Fprint(w,"MNCLR")
+	case "up":
+		sendCommand([]byte("MNCUP\r"),con)
+		fmt.Fprint(w,"MNUP")
+	case "down":
+		sendCommand([]byte("MNCDN\r"),con)
+		fmt.Fprint(w,"MNDN")
+	case "return":
+		sendCommand([]byte("MNRTN\r"),con)
+		fmt.Fprint(w,"MNRTN")
+	default:
+		fmt.Fprintf(w,"Invalid Command: %s",cursor)
+	}
 }
 
 func musicHandler(w http.ResponseWriter, r *http.Request){
