@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"fmt"
 	"log"
 	"net"
@@ -20,6 +21,7 @@ func main() {
 	mux.HandleFunc("/music", musicHandler)
 	mux.HandleFunc("/game", gameHandler)
 	mux.HandleFunc("/tv", tvHandler)
+	mux.HandleFunc("/roku/{command}",rokuHandler)
 	mux.HandleFunc("/network", networkHandler)
 	mux.HandleFunc("/cursor/{cursor}", cursorHandler)
 	mux.HandleFunc("/menu/{state}", menuHandler)
@@ -50,6 +52,54 @@ func (d *DirectHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	direct()
 }
 
+func rokuHandler(w http.ResponseWriter, r *http.Request) {
+	cmd := strings.ToLower(r.PathValue("command"))
+	sendCMD := ""
+	switch cmd{
+	case "poweron":
+		sendCMD = "keypress/PowerOn"
+	case "power":
+		sendCMD = "keypress/Power"
+	case "home":
+		sendCMD = "keypress/Home"
+	case "back":
+		sendCMD = "keypress/Back"
+	case "avr":
+		sendCMD = "keypress/InputHdmi3"
+	case "shield":
+		sendCMD = "keypress/InputHdmi2"
+	case "switch":
+		sendCMD = "keypress/InputHdmi1"
+	case "volumeup":
+		sendCMD = "keypress/VolumeUp"
+	case "volumedown":
+		sendCMD = "keypress/VolumeDown"
+	case "up":
+		sendCMD = "keypress/Up"
+	case "left":
+		sendCMD = "keypress/Left"
+	case "ok":
+		sendCMD = "keypress/Select"
+	case "right":
+		sendCMD = "keypress/Right"
+	case "down":
+		sendCMD = "keypress/Down"
+	default:
+		return
+	}
+
+	url := "http://192.168.67.149:8060/" + sendCMD //TODO: Magic Number
+	resp, err := http.Post(url,"application/json",bytes.NewBuffer(nil))
+	if err != nil {
+		msg := fmt.Sprintf("Error: %s", err)
+		fmt.Println(msg)
+		fmt.Fprintf(w,msg)
+		return
+	}
+	defer resp.Body.Close()
+	fmt.Println("Response code:", resp.Status)
+	fmt.Fprintf(w,"Response code: %s", resp.Status)
+	}
 func inputHandler(w http.ResponseWriter, r *http.Request) {
 	con := avrConnect()
 	defer con.Close()
@@ -128,13 +178,25 @@ func dolbyHandler(w http.ResponseWriter, r *http.Request) {
 func gameHandler(w http.ResponseWriter, r *http.Request) {
 	con := avrConnect()
 	defer con.Close()
+	r.SetPathValue("command","poweron")
+	rokuHandler(w, r)
+	time.Sleep(5 * time.Second)
+	r.SetPathValue("command","avr")
+	rokuHandler(w,r)
+	time.Sleep(5 * time.Second)
+	w.Write([]byte("GameMode Activated"))
 	sendCommand([]byte("SIGAME\r"), con)
 	sendCommand([]byte("MSMCH STEREO\r"), con)
-	w.Write([]byte("GameMode Activated"))
 }
 func networkHandler(w http.ResponseWriter, r *http.Request) {
 	con := avrConnect()
 	defer con.Close()
+	r.SetPathValue("command","poweron")
+	rokuHandler(w, r)
+	time.Sleep(5 * time.Second)
+	r.SetPathValue("command","avr")
+	rokuHandler(w, r)
+	time.Sleep(5 * time.Second)
 	sendCommand([]byte("SINET\r"), con)
 	sendCommand([]byte("MSDIRECT\r"), con)
 }

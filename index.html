@@ -20,7 +20,7 @@ button:hover {
 	background-color: #222;
 	color: #fff;
 }
-#arrows {
+.arrows {
 	text-align: center;
 	max-width: 350px;
 	border: 1px solid #122112;
@@ -33,9 +33,16 @@ button:hover {
 	background-color: #007700;
 	color: #ffffff;
 }
+.remoteContainer {
+	border: 3px solid #222222;
+	display: inline-block;
+	vertical-align: top;
+}
 </style>
 	</head>
 	<body>
+		<div id="avr" class="remoteContainer">
+		<h2>AVR</h2>
 		<div id="inputs">
 			<h3>inputs</h3>
 			<button hx-get="/tv" hx-target='#log'>TV</button>
@@ -52,7 +59,7 @@ button:hover {
 		</div>
 		<div id="Controls">
 			<h3>Controls</h3>
-			<div id="arrows">
+			<div class="arrows">
 				<div id="arrowVol">
 					<button hx-get="/vol/-5" hx-target='#log' hx-queue="true">Vol -</button>
 					<button hx-get="/vol/+5" hx-target='#log' hx-queue="true">Vol +</button>
@@ -76,6 +83,43 @@ button:hover {
 				</div>
 
 			</div>
+		</div>
+		</div>
+		<div id="tv" class="remoteContainer">
+			<h2>Roku</h2>
+			<div id="topRow">
+				<h3>Main</h3>
+				<button hx-get="/roku/power" hx-target='#log'>Power</button>
+				<button hx-get="/roku/home" hx-target='#log'>Home</button>
+				<button hx-get="/roku/back" hx-target='#log'>Back</button>
+			</div>
+			<div id="rokuInputs">
+				<h3>Inputs</h3>
+				<button hx-get="/roku/AVR" hx-target='#log'>AVR</button>
+				<button hx-get="/roku/shield" hx-target='#log'>Shield</button>
+				<button hx-get="/roku/switch" hx-target='#log'>Switch</button>
+			</div>
+			<div id="rokuControls">
+				<h3>Controls</h3>
+				<div class="arrows">
+					<div>
+						<button hx-get="/roku/VolumeDown" hx-target='#log'>-</button>
+						<button hx-get="/roku/VolumeUp" hx-target='#log'>+</button>
+					</div>
+					<div>
+						<button hx-get="/roku/Up" hx-target='#log'>Up</button>
+					</div>
+					<div>
+						<button hx-get="/roku/Left" hx-target='#log'>Left</button>
+						<button hx-get="/roku/Ok" hx-target='#log'>Ok</button>
+						<button hx-get="/roku/Right" hx-target='#log'>Right</button>
+					</div>
+					<div>
+						<button hx-get="/roku/Down" hx-target='#log'>Down</button>
+					</div>
+				</div>
+			</div>
+
 		</div>
 		<div id="log">Hello World</div>
 
