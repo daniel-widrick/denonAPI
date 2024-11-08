@@ -16,6 +16,10 @@ func main(){
 	mux.Handle("/dolbyMovie",&DolbyHandler{})
 	mux.Handle("/stereo",&StereoHandler{})
 	mux.Handle("/direct",&DirectHandler{})
+	mux.HandleFunc("/dolby",dolbyHandler)
+	mux.HandleFunc("/music",musicHandler)
+	mux.HandleFunc("/game",gameHandler)
+	mux.HandleFunc("/tv",tvHandler)
 	mux.HandleFunc("/vol/{setting}",volHandler)
 	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		http.ServeFile(w,r,"index.html")
@@ -37,6 +41,37 @@ func(d *StereoHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 type DirectHandler struct{}
 func(d *DirectHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	direct()
+}
+
+func musicHandler(w http.ResponseWriter, r *http.Request){
+	con := avrConnect()
+	defer con.Close()
+	sendCommand([]byte("SITV\r"),con)
+	sendCommand([]byte("MSDOLBY DIGITAL\r"),con)
+	w.Write([]byte("Music Mode Activated"))
+}
+
+
+func dolbyHandler(w http.ResponseWriter, r *http.Request){
+	con := avrConnect()
+	defer con.Close()
+	sendCommand([]byte("MSDOLBY DIGITAL\r"),con)
+	w.Write([]byte("Dolby Digital Activated"))
+}
+
+func gameHandler(w http.ResponseWriter, r *http.Request){
+	con := avrConnect()
+	defer con.Close()
+	sendCommand([]byte("SIGAME\r"),con)
+	sendCommand([]byte("MSMCH STEREO\r"),con)
+	w.Write([]byte("GameMode Activated"))
+}
+func tvHandler(w http.ResponseWriter, r *http.Request){
+	con := avrConnect()
+	defer con.Close()
+	sendCommand([]byte("SITV\r"),con)
+	sendCommand([]byte("MSMCH STEREO\r"),con)
+	w.Write([]byte("TV Activated"))
 }
 
 func volHandler(w http.ResponseWriter, r *http.Request){
