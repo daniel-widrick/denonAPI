@@ -1,3 +1,3 @@
-module widrick.net/denonapi
+module widrick.net/denonAPI
 
 go 1.23.2
