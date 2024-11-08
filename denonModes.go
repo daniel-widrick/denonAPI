@@ -134,6 +134,7 @@ func networkHandler(w http.ResponseWriter, r *http.Request){
 	con := avrConnect()
 	defer con.Close()
 	sendCommand([]byte("SINET\r"),con)
+	sendCommand([]byte("MSDIRECT\r"),con)
 }
 func tvHandler(w http.ResponseWriter, r *http.Request){
 	con := avrConnect()
